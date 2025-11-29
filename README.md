@@ -93,6 +93,3 @@ fullstack project/
 │   └── ...
 └── README.md           # Documentation du projet
 ```
-
-## Auteur
-Projet développé par LOQµ.
