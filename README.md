@@ -1,5 +1,6 @@
+# Project presented by :
+Sandra Abbes tp6 && Malek Setti tp8
 # RentEase
-
 ## Description
 RentEase est une application web fullstack de location immobilière moderne et intuitive. Elle permet aux utilisateurs de parcourir des annonces immobilières, de filtrer les résultats selon leurs critères et de contacter les propriétaires directement. Une interface d'administration complète permet de gérer les biens et les messages.
 
