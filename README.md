@@ -1,95 +1,60 @@
-# Project presented by :
-Sandra Abbes tp6 && Malek Setti tp8
-# RentEase
-## Description
-RentEase est une application web fullstack de location immobilière moderne et intuitive. Elle permet aux utilisateurs de parcourir des annonces immobilières, de filtrer les résultats selon leurs critères et de contacter les propriétaires directement. Une interface d'administration complète permet de gérer les biens et les messages.
+# Property Rental Platform
 
-## Fonctionnalités Clés
+A simple MERN (MongoDB, Express, React, Node.js) application for browsing and managing rental properties.
 
-### 🏠 Pour les Utilisateurs
--   **Catalogue de Biens**: Visualisation des propriétés avec images, prix et détails.
--   **Recherche Avancée**: Filtrage par ville, prix minimum/maximum et nombre de chambres.
--   **Détails du Bien**: Vue détaillée avec une mise en page optimisée (image à gauche, infos à droite).
--   **Contact**: Formulaire intégré pour envoyer des messages aux propriétaires.
--   **Responsive Design**: Interface adaptée aux mobiles et desktops.
+## Features
 
-### 🛡️ Pour les Administrateurs
--   **Dashboard**: Vue d'ensemble des propriétés et des messages reçus.
--   **Gestion des Propriétés**: Ajouter, modifier et supprimer des annonces immobilières.
--   **Gestion des Messages**: Consulter et supprimer les demandes de contact.
--   **Sécurité**: Routes protégées par authentification JWT.
+- Browse property listings and filter by city, price range, and number of rooms
+- View property details and contact the owner
+- Register and log in with JSON Web Token authentication
+- Admin dashboard for managing properties and viewing messages
+- Upload property images
 
-## Technologies Utilisées
+## Requirements
 
-### Frontend
--   **React**: Bibliothèque UI principale.
--   **Vite**: Build tool rapide pour le développement.
--   **CSS Moderne**: Système de design personnalisé avec variables CSS (Couleurs Indigo/Emerald, Glassmorphism).
--   **React Router**: Gestion de la navigation.
--   **Axios**: Requêtes HTTP.
+- Node.js and npm
+- MongoDB running locally or a MongoDB Atlas connection string
 
-### Backend
--   **Node.js & Express**: Serveur API RESTful.
--   **MongoDB & Mongoose**: Base de données NoSQL et modélisation des données.
--   **JWT (JSON Web Tokens)**: Authentification sécurisée.
--   **Multer**: Gestion de l'upload d'images.
+## Setup
 
-## Installation et Démarrage
+### 1. Configure the backend
 
-### Prérequis
--   Node.js (v14+ recommandé)
--   MongoDB (local ou Atlas)
+Create `backend/.env` with your MongoDB connection string and a secret used to sign authentication tokens:
 
-### 1. Configuration du Backend
-Accédez au dossier backend, installez les dépendances et lancez le serveur.
-
-```bash
-cd backend
-npm install
-```
-
-Assurez-vous d'avoir un fichier `.env` à la racine du dossier `backend` avec les variables suivantes :
 ```env
-MONGO_URI=mongodb://localhost:27017/rentease
-JWT_SECRET=votre_secret_super_securise
+MONGO_URI=mongodb://127.0.0.1:27017/property-rental
+JWT_SECRET=replace-this-with-a-long-random-secret
 PORT=5000
 ```
 
-Lancer le serveur :
-```bash
+For MongoDB Atlas, replace `MONGO_URI` with your Atlas connection string. Make sure the database is available before starting the server.
+
+In a terminal, install dependencies and start the backend:
+
+```sh
+cd backend
+npm install
 npm run dev
-# ou
-node server.js
 ```
-Le serveur démarrera sur `http://localhost:5000`.
 
-### 2. Configuration du Frontend
-Accédez au dossier frontend, installez les dépendances et lancez l'application.
+The API runs at `http://localhost:5000` by default. Uploaded images are stored in `backend/uploads/` and served from `/uploads`.
 
-```bash
+### 2. Start the frontend
+
+In a second terminal from the project root:
+
+```sh
 cd frontend
 npm install
 npm run dev
 ```
-L'application sera accessible sur `http://localhost:5173` (ou le port indiqué par Vite).
 
-## Structure du Projet
+Open the local URL printed by Vite, usually `http://localhost:5173`. The frontend currently sends API requests to `http://localhost:5000`.
 
-```
-fullstack project/
-├── backend/            # API Node.js/Express
-│   ├── config/         # Configuration DB
-│   ├── middleware/     # Auth middleware
-│   ├── models/         # Modèles Mongoose (User, Property, Message)
-│   ├── routes/         # Routes API
-│   └── server.js       # Point d'entrée
-│
-├── frontend/           # Application React
-│   ├── src/
-│   │   ├── components/ # Composants réutilisables (Navbar, PropertyCard...)
-│   │   ├── context/    # Context API (AuthContext)
-│   │   ├── pages/      # Pages principales (Home, AdminDashboard...)
-│   │   └── index.css   # Styles globaux et variables
-│   └── ...
-└── README.md           # Documentation du projet
-```
+## Development Notes
+
+- The frontend uses React, React Router, Axios, and Vite.
+- The backend uses Express, Mongoose, JWT, and Multer.
+- Admin accounts can currently be selected during registration. This is convenient for local development, but must be restricted before deploying the application.
+- Frontend checks: run `npm run lint` or `npm run build` from `frontend/`.
+- The backend package does not currently define an automated test suite.

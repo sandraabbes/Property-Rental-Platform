@@ -1,14 +1,45 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
+/* SVG icons — consistent 16px, stroke-width 1.5 */
+const ArrowLeftIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+    </svg>
+);
+
+const MapPinIcon = () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+    </svg>
+);
+
+const DoorOpenIcon = () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M13 4H3v18h10V4z"/>
+        <path d="M21 20V8l-8-4"/>
+        <circle cx="16" cy="12" r="1" fill="currentColor"/>
+    </svg>
+);
+
+const CheckIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <polyline points="20 6 9 17 4 12"/>
+    </svg>
+);
+
 const PropertyDetails = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { user } = useContext(AuthContext);
     const [property, setProperty] = useState(null);
     const [message, setMessage] = useState('');
     const [msgSent, setMsgSent] = useState(false);
+    const [sending, setSending] = useState(false);
 
     useEffect(() => {
         const fetchProperty = async () => {
@@ -24,66 +55,119 @@ const PropertyDetails = () => {
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
+        setSending(true);
         try {
             await axios.post('http://localhost:5000/api/messages', {
                 propertyId: id,
-                userEmail: user ? user.email : 'guest@example.com', // Fallback or require login
+                userEmail: user ? user.email : 'guest@example.com',
                 message
             });
             setMsgSent(true);
             setMessage('');
         } catch (err) {
             console.error(err);
+        } finally {
+            setSending(false);
         }
     };
 
-    if (!property) return <p>Loading...</p>;
+    if (!property) {
+        return (
+            <div className="container">
+                <p className="loading-row">Loading listing…</p>
+            </div>
+        );
+    }
 
     return (
         <div className="container">
-            <div className="property-details-grid">
-                <div className="property-image-wrapper">
-                    {property.images.length > 0 ? (
-                        <img src={property.images[0]} alt={property.title} className="property-detail-image" />
-                    ) : (
-                        <div style={{ height: '400px', backgroundColor: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ color: '#9ca3af' }}>No Image Available</span>
+            <div className="detail-page">
+                <button
+                    type="button"
+                    className="detail-back"
+                    onClick={() => navigate(-1)}
+                    aria-label="Back to listings"
+                >
+                    <ArrowLeftIcon />
+                    All listings
+                </button>
+
+                <div className="detail-grid">
+                    {/* Left: image */}
+                    <div className="detail-image-wrap">
+                        {property.images && property.images.length > 0 ? (
+                            <img
+                                src={property.images[0]}
+                                alt={property.title}
+                                className="detail-image"
+                            />
+                        ) : (
+                            <div className="detail-no-image">No photo available</div>
+                        )}
+                    </div>
+
+                    {/* Right: info */}
+                    <div className="detail-info">
+                        <p className="detail-city">
+                            <MapPinIcon />
+                            {property.city}
+                        </p>
+
+                        <h1 className="detail-title">{property.title}</h1>
+
+                        <p className="detail-price">
+                            ${Number(property.price).toLocaleString()}
+                            <span> / month</span>
+                        </p>
+
+                        <div className="detail-pills">
+                            <span className="detail-pill">
+                                <DoorOpenIcon />
+                                {property.rooms} {property.rooms === 1 ? 'room' : 'rooms'}
+                            </span>
+                            <span className="detail-pill">
+                                <MapPinIcon />
+                                {property.city}
+                            </span>
                         </div>
-                    )}
-                </div>
 
-                <div className="property-info-wrapper">
-                    <div>
-                        <h2 className="property-title">{property.title}</h2>
-                        <p className="property-location" style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{property.city}</p>
-                        <p className="property-price">${property.price} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>/ month</span></p>
-                    </div>
+                        <div>
+                            <p className="detail-desc-label">About this property</p>
+                            <p className="detail-desc" style={{ marginTop: '0.5rem' }}>{property.description}</p>
+                        </div>
 
-                    <div className="property-meta">
-                        <span>{property.rooms} Rooms</span>
-                        <span>{property.city}</span>
-                    </div>
+                        <div className="contact-section">
+                            <h2 className="contact-title">Send a message to the owner</h2>
 
-                    <div className="property-description">
-                        <p>{property.description}</p>
-                    </div>
+                            {msgSent && (
+                                <div className="message-success">
+                                    <CheckIcon />
+                                    Message sent. The owner will contact you by email.
+                                </div>
+                            )}
 
-                    <div className="contact-section">
-                        <h3 className="contact-title">Contact Owner</h3>
-                        {msgSent && <div className="message-success">Message sent successfully!</div>}
-                        <form onSubmit={handleSendMessage}>
-                            <div className="form-group">
-                                <textarea
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="I'm interested in this property..."
-                                    className="form-control"
-                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', minHeight: '120px', resize: 'vertical' }}
-                                    required
-                                />
-                            </div>
-                            <button type="submit" className="btn btn-primary btn-block">Send Message</button>
-                        </form>
+                            <form onSubmit={handleSendMessage} noValidate>
+                                <div className="form-group">
+                                    <label className="form-label" htmlFor="contact-message">Your message</label>
+                                    <textarea
+                                        id="contact-message"
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        placeholder="Hi, I'm interested in this property and would like to arrange a viewing…"
+                                        style={{ minHeight: '110px' }}
+                                        required
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary btn-block"
+                                    style={{ padding: '0.7rem' }}
+                                    disabled={sending || msgSent}
+                                >
+                                    {sending ? 'Sending…' : msgSent ? 'Message sent' : 'Send message'}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -24,18 +24,36 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="container">
-            <FilterBar onFilter={fetchProperties} />
-            {loading ? (
-                <p style={{ textAlign: 'center', fontSize: '1.2rem', color: 'var(--text-secondary)' }}>Loading properties...</p>
-            ) : (
-                <div className="property-grid">
-                    {properties.map(property => (
-                        <PropertyCard key={property._id} property={property} />
-                    ))}
-                </div>
-            )}
-        </div>
+        <main>
+            <div className="container">
+                <header className="page-header">
+                    <p className="page-header__eyebrow">Rental listings</p>
+                    <h1 className="page-header__title">
+                        Find a property that fits your life — not just your budget.
+                    </h1>
+                </header>
+
+                <FilterBar onFilter={fetchProperties} />
+
+                {loading ? (
+                    <p className="loading-row">Loading properties…</p>
+                ) : properties.length === 0 ? (
+                    <p className="loading-row">No properties match your filters.</p>
+                ) : (
+                    <>
+                        <div className="section-row">
+                            <h2 className="section-title">Available now</h2>
+                            <span className="section-count">{properties.length} listing{properties.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="property-grid">
+                            {properties.map(property => (
+                                <PropertyCard key={property._id} property={property} />
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
+        </main>
     );
 };
 
